@@ -1,0 +1,122 @@
+version: "3.9"
+
+services:
+  # ─────────────────────────────────────────────
+  # Base de Datos MySQL 8
+  # ─────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: gymsync_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-gymsync_root_2024}
+      MYSQL_DATABASE: ${DB_NAME:-gymsync_db}
+      MYSQL_USER: ${DB_USER:-gymsync_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gymsync_pass_2024}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - gymsync_mysql_data:/var/lib/mysql
+      - ./backend/src/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-gymsync_root_2024}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - gymsync_network
+
+  # ─────────────────────────────────────────────
+  # Redis (Queue para Agentes)
+  # ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: gymsync_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - gymsync_redis_data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD:-gymsync_redis_2024}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-gymsync_redis_2024}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - gymsync_network
+
+  # ─────────────────────────────────────────────
+  # Backend API (Node.js + Express)
+  # ─────────────────────────────────────────────
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: gymsync_api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: ${API_PORT:-3000}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-gymsync_db}
+      DB_USER: ${DB_USER:-gymsync_user}
+      DB_PASSWORD: ${DB_PASSWORD:-gymsync_pass_2024}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-gymsync_redis_2024}
+      JWT_SECRET: ${JWT_SECRET:-gymsync_jwt_super_secret_2024_change_in_production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - gymsync_uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gymsync_network
+
+  # ─────────────────────────────────────────────
+  # phpMyAdmin (Dev only)
+  # ─────────────────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: gymsync_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USER:-gymsync_user}
+      PMA_PASSWORD: ${DB_PASSWORD:-gymsync_pass_2024}
+      UPLOAD_LIMIT: 50M
+    ports:
+      - "${PMA_PORT:-8080}:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - gymsync_network
+    profiles:
+      - dev
+
+volumes:
+  gymsync_mysql_data:
+    name: gymsync_mysql_data
+  gymsync_redis_data:
+    name: gymsync_redis_data
+  gymsync_uploads:
+    name: gymsync_uploads
+
+networks:
+  gymsync_network:
+    name: gymsync_network
+    driver: bridge
