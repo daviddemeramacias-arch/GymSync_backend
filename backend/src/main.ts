@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { AppFactory } from './app';
 import { DatabaseService } from '@config/database.config';
 import { logger } from '@shared/utils/logger';
+import { startAgents } from '@agents/index';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
@@ -14,6 +15,7 @@ async function bootstrap(): Promise<void> {
 
     // 2. Crear aplicación Express
     const app = AppFactory.create();
+    startAgents();
 
     // 3. Iniciar servidor
     app.listen(PORT, '0.0.0.0', () => {
