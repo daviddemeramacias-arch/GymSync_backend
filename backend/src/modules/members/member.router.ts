@@ -69,5 +69,24 @@ router.patch('/memberships/:id/freeze', authGuard, requireRoles(1, 2), async (re
   } catch (e) { next(e); }
 });
 
+// Create socio + PIN
+router.post('/users', authGuard, requireRoles(1,2), [
+  body('gym_id').isString().notEmpty(),
+  body('first_name').isString().notEmpty(),
+  body('last_name').isString().notEmpty(),
+  body('phone').isString().notEmpty(),
+], validate, async (req, res, next) => {
+  try {
+    const r = AppDataSource.getRepository('roles') as any;
+    const role = await r.findOneBy({ name: 'MEMBER' });
+    if (!role) throw new AppError('Rol MEMBER no encontrado', 500);
+    const ur = AppDataSource.getRepository('users') as any;
+    const u = ur.create({ ...req.body, role_id: role.id, status: 'ACTIVE', pin_temp: true });
+    await ur.save(u);
+    const { pin } = await createPinForUser(u.id);
+    res.status(201).json({ status: 'success', user: u, pin });
+  } catch (e) { next(e); }
+});
+
 export { router as membersRouter };
 export default router;

@@ -1,6 +1,11 @@
 {
   "name": "@gymsync/backend",
-  "version": "1.0.0",
+  "allowScripts": {
+    "esbuild": true,
+    "sharp": true,
+    "@parcel/watcher": true,
+    "debug": true
+  },
   "description": "GymSync Backend API — Node.js + Express + TypeORM",
   "main": "dist/main.js",
   "scripts": {
