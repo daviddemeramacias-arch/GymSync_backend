@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GymSync Admin Web (SPA preview)</title>
+<style>
+  :root{--coral:#F4806A;--teal:#437F91;--moss:#4C5E51;--wheat:#D1B174;--bg:#F1F5F9}
+  body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#0f172a;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+  aside{background:#fff;border-right:1px solid #e2e8f0;padding:14px}
+  aside h2{margin:0 0 12px;color:var(--moss);font-size:16px}
+  aside a{display:block;padding:9px 12px;margin:3px 0;border-radius:8px;text-decoration:none;color:#334155;font-size:14px;cursor:pointer}
+  aside a.active,aside a:hover{background:var(--teal);color:#fff}
+  main{padding:20px}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  header h1{margin:0;color:var(--moss);font-size:20px}
+  .chip{background:var(--wheat);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+  .card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:3px solid var(--teal)}
+  .card h3{margin:0 0 6px;color:var(--moss);font-size:14px}
+  .num{font-size:26px;font-weight:800;color:var(--coral)}
+  .section{display:none} .section.active{display:block}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+  th,td{padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:left}
+  th{color:var(--moss)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .ok{background:#10B981;color:#fff}.warn{background:#f59e0b;color:#fff}.bad{background:#EF4444;color:#fff}
+  button{background:var(--coral);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;margin:4px}
+</style>
+</head>
+<body>
+<aside>
+  <h2>GymSync</h2>
+  <a class="nav active" data-v="dashboard">🏠 Dashboard</a>
+  <a class="nav" data-v="socios">👥 Socios</a>
+  <a class="nav" data-v="pagos">💳 Pagos</a>
+  <a class="nav" data-v="marketplace">🛒 Marketplace</a>
+  <a class="nav" data-v="rutinas">🏋️ Rutinas</a>
+  <a class="nav" data-v="notif">🔔 Notificaciones</a>
+</aside>
+<main>
+  <header>
+    <h1 id="title">Dashboard</h1>
+    <span class="chip">M1–M6 (backend)</span>
+  </header>
+
+  <div id="dashboard" class="section active">
+    <div class="grid">
+      <div class="card"><h3>Socios activos</h3><div class="num">128</div><span class="badge ok">+6 esta semana</span></div>
+      <div class="card"><h3>Pagos pendientes</h3><div class="num">12</div><span class="badge warn">En revisión</span></div>
+      <div class="card"><h3>Ingresos del mes</h3><div class="num">$3,420</div><span class="badge ok">+8%</span></div>
+      <div class="card"><h3>Aforo hoy</h3><div class="num">57</div><span class="badge ok">Normal</span></div>
+    </div>
+  </div>
+
+  <div id="socios" class="section">
+    <h2 style="color:var(--moss)">Socios</h2>
+    <button>+ Nuevo socio</button>
+    <table>
+      <tr><th>Nombre</th><th>Teléfono</th><th>Plan</th><th>Estado</th></tr>
+      <tr><td>Ana M.</td><td>+5939990001</td><td>Mensual</td><td><span class="badge ok">Activa</span></td></tr>
+      <tr><td>Carlos R.</td><td>+5939990002</td><td>Quincenal</td><td><span class="badge warn">Por vencer</span></td></tr>
+    </table>
+  </div>
+
+  <div id="pagos" class="section">
+    <h2 style="color:var(--moss)">Pagos pendientes</h2>
+    <table>
+      <tr><th>Socio</th><th>Método</th><th>Monto</th><th>Estado</th><th>Acción</th></tr>
+      <tr><td>Luisa T.</td><td>Transferencia</td><td>$45.00</td><td><span class="badge warn">Pendiente</span></td><td><button>Aprobar</button></td></tr>
+    </table>
+  </div>
+
+  <div id="marketplace" class="section">
+    <h2 style="color:var(--moss)">Marketplace</h2>
+    <button>+ Nuevo producto</button>
+    <table>
+      <tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th></tr>
+      <tr><td>Proteína 1kg</td><td>Suplemento</td><td>$42.00</td><td>8</td></tr>
+      <tr><td>Botella 500ml</td><td>Accesorio</td><td>$8.00</td><td>3</td></tr>
+    </table>
+  </div>
+
+  <div id="rutinas" class="section">
+    <h2 style="color:var(--moss)">Rutinas</h2>
+    <p>Rutinas, bitácora y sugerencias de progresión (M5).</p>
+    <button>+ Nueva rutina</button>
+  </div>
+
+  <div id="notif" class="section">
+    <h2 style="color:var(--moss)">Notificaciones</h2>
+    <p>Envío de WhatsApp/Email/Push y logs (M6).</p>
+    <button>Enviar notificación</button>
+  </div>
+</main>
+<script>
+  document.querySelectorAll('.nav').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+      const v=a.dataset.v;
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      document.getElementById(v).classList.add('active');
+      document.getElementById('title').textContent=a.textContent.trim().replace(/^.\s*/,'');
+    });
+  });
+</script>
+</body>
+</html>

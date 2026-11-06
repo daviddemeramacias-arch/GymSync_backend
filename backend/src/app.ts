@@ -14,6 +14,9 @@ import { healthRouter } from '@modules/health/health.router';
 import { authRouter } from '@modules/auth/auth.router';
 import { membersRouter } from '@modules/members/member.router';
 import { financeRouter } from '@modules/finance/finance.router';
+import { marketplaceRouter } from '@modules/marketplace/marketplace.router';
+import { routinesRouter } from '@modules/routines/routines.router';
+import { notificationsRouter } from '@modules/notifications/notifications.router';
 // import { accessRouter }   from '@modules/access/access.router';
 // import { financeRouter }  from '@modules/finance/finance.router';
 
@@ -121,6 +124,9 @@ export class AppFactory {
     app.use(`${API_PREFIX}/auth`, authRouter);
     app.use(`${API_PREFIX}/members`, membersRouter);
     app.use(`${API_PREFIX}/finance`, financeRouter);
+    app.use(`${API_PREFIX}/marketplace`, marketplaceRouter);
+    app.use(`${API_PREFIX}/routines`, routinesRouter);
+    app.use(`${API_PREFIX}/notifications`, notificationsRouter);
 
     // ── Módulos (se activan por fase) ──
     // app.use(`${API_PREFIX}/auth`,      authRouter);

@@ -1,23 +1,22 @@
-# GymSync — Estado de avance (sesión)
+# GymSync — Estado de avance (checkpoint final)
 
-## Completado
-- Módulo 1 (Auth): entidad User, login PIN + JWT, generate PIN, guard RBAC, rutas.
-- Módulo 2 (Members): entidades Plan/Membership, CRUD planes, asignación y congelamiento, rutas.
-- Módulo 3 (Finance): rutas de cuentas bancarias y pagos (crear/listar/aprobar/rechazar). (Implementación por consultas/entidades a refinar.)
+## Backend (M1–M6) código completo
+M1 Auth, M2 Members, M3 Finance, M4 Marketplace, M5 Routines, M6 Notifications (endpoints en Express + TypeORM/MySQL).
 
-## Archivos clave
-- backend/src/modules/auth/*
-- backend/src/modules/members/*
-- backend/src/modules/finance/finance.router.ts
-- backend/src/app.ts (rutas auth + members + finance activadas)
-- PLAN_MODULOS.md (plan completo M1..M10)
-- gymsync/backend/src/database/init.sql (schema + seed)
+## Frontend
+- admin-web scaffold Angular instalado (npm install OK, 0 vuln).
+- pwa-socio carpeta placeholder.
+- preview.html / preview-pwa.html visual con paleta corporativa.
 
 ## Entorno
-- MySQL 8 local en puerto 3306, BD gymsync_db inicializada.
-- Build: ts compila; dependencias npm afectadas por workspaces monorepo (revisar antes de correr dev).
+- MySQL 8 local puerto 3306, BD gymsync_db inicializada.
+- backend/.env configurado (localhost).
+- GitHub: ramas develop + feature/modulos-1-2-3 push; falta PR manual.
+- npm/workspaces: instalar con --no-workspaces o Node 20 para run dev.
 
-## Pendiente al retomar
-- Reparar runtime npm (workspaces) o instalar deps flat.
-- Mover consultas de finance a repositorio/entidades reales.
-- Continuar Módulo 4 etc. + frontends.
+## Para retomar (una sola frase basta)
+"Lee PROGRESO.md y PLAN_MODULOS.md y continuamos."
+Sugerencia: verificar admin-web con `ng serve`, luego conectar a backend.
+
+## Paleta corporativa
+Deep Moss #4C5E51 · Steel Teal #437F91 · Coral Rush #F4806A · Golden Wheat #D1B174.
