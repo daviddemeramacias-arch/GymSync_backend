@@ -18,6 +18,7 @@ import { marketplaceRouter } from '@modules/marketplace/marketplace.router';
 import { accessRouter } from '@modules/access/access.router';
 import { routinesRouter } from '@modules/routines/routines.router';
 import { notificationsRouter } from '@modules/notifications/notifications.router';
+import { agentsRouter } from '@modules/agents/agents.router';
 import { metricsRouter } from '@modules/metrics/metrics.router';
 // import { accessRouter }   from '@modules/access/access.router';
 // import { financeRouter }  from '@modules/finance/finance.router';
@@ -130,6 +131,8 @@ export class AppFactory {
     app.use(`${API_PREFIX}/access`, accessRouter);
     app.use(`${API_PREFIX}/routines`, routinesRouter);
     app.use(`${API_PREFIX}/notifications`, notificationsRouter);
+    app.use(`${API_PREFIX}/agents`, agentsRouter);
+    app.use(`${API_PREFIX}/metrics`, metricsRouter);
     app.use(`${API_PREFIX}/metrics`, metricsRouter);
 
     // ── Módulos (se activan por fase) ──
