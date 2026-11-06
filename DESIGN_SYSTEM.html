@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GymSync Design — Style Guide</title>
+<style>
+  :root{--coral:#F4806A;--teal:#437F91;--moss:#4C5E51;--wheat:#D1B174;--bg:#F1F5F9}
+  body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:0;background:var(--bg);color:#0f172a}
+  header{background:var(--moss);color:#fff;padding:16px 24px}
+  main{max-width:1100px;margin:0 auto;padding:24px}
+  h2{color:var(--moss);margin-top:28px}
+  .swatches{display:flex;gap:12px;flex-wrap:wrap}
+  .sw{width:120px;height:80px;border-radius:10px;display:flex;align-items:flex-end;padding:8px;color:#fff;font-size:12px;font-weight:700}
+  .comp{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .btn{padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;color:#fff;background:var(--coral)}
+  .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:3px solid var(--teal)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#10B981;color:#fff;margin-left:6px}
+</style>
+</head>
+<body>
+<header><h1 style="margin:0">GymSync — Design System (paleta & componentes)</h1></header>
+<main>
+  <h2>Paleta corporativa</h2>
+  <div class="swatches">
+    <div class="sw" style="background:#4C5E51">Deep Moss</div>
+    <div class="sw" style="background:#437F91">Steel Teal</div>
+    <div class="sw" style="background:#F4806A">Coral Rush</div>
+    <div class="sw" style="background:#D1B174;color:#333">Golden Wheat</div>
+    <div class="sw" style="background:#10B981">Emerald</div>
+    <div class="sw" style="background:#EF4444">Red</div>
+  </div>
+  <h2>Componentes</h2>
+  <div class="comp">
+    <button class="btn">Primary CTA</button>
+    <span class="badge">Activo</span>
+    <div class="card" style="width:240px"><h3 style="margin:0 0 6px;color:#4C5E51">Card</h3><p style="margin:0;font-size:13px">Contenedor base de información (Steel Teal accent).</p></div>
+  </div>
+  <h2>Tipografía & espaciado</h2>
+  <p>Base: system-ui, 14px en tablas, 18–20px en títulos. Radios 8–14px. Sombras suaves. Contenedores con borde superior accent (Steel Teal).</p>
+  <h2>Breakpoints</h2>
+  <p>Admin: sidebar 220px + content fluido. Móvil (PWA): 360px ancho, card pairing 2 columnas.</p>
+</main>
+</body>
+</html>
