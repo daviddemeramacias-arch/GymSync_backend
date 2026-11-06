@@ -211,7 +211,20 @@ CREATE TABLE IF NOT EXISTS notification_logs (
   INDEX idx_notif_gym_date (gym_id, created_at)
 ) ENGINE=InnoDB;
 
--- Seed inicial
+CREATE TABLE IF NOT EXISTS workout_logs (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id CHAR(36) NOT NULL,
+  gym_id CHAR(36) NOT NULL,
+  routine_id CHAR(36),
+  exercise VARCHAR(150) NOT NULL,
+  sets INT UNSIGNED DEFAULT 1,
+  reps INT UNSIGNED DEFAULT 1,
+  weight DECIMAL(6,2) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (gym_id) REFERENCES gyms(id) ON DELETE CASCADE,
+  INDEX idx_logs_user (user_id, created_at)
+) ENGINE=InnoDB;
 INSERT IGNORE INTO roles (name, description) VALUES
   ('OWNER', 'Dueno del gimnasio - acceso total'),
   ('ADMIN', 'Administrador - gestion operativa'),
