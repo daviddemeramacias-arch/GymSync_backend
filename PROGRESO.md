@@ -1,7 +1,19 @@
-# PROGRESO GymSync — Estado actual
+# GymSync — Checkpoint final de la sesión
 
-M1–M6 backend refactor a servicios + UI admin M1–M6.
-Dependencias frontend instaladas.
-GitHub backend y fronted push realizados.
+## Completado
+- Backend: M1–M6 + M8 agentes, M9 metrics, M3 OCR, M4 access (backend).
+- Frontend admin-web: M1–M6 + M7 Offline base + M10 branding/PWA + login integrado con HTTP service.
+- PWA socio: preview móvil instalable.
+- Docker/DevOps docs, scripts start-backend.
+- DB inicializada, previews abiertos.
+- GitHub: develop sincronizado en backend y frontend.
 
-Instrucción guardada (automática): Al final de cada bloque de trabajo, subir cambios a los repositorios correspondientes (backend/frontend) sin pedir confirmación; solo avisar cuando estén subidos.
+## Pendiente principal
+- Runtime: arrancar backend (Node/npm/Dependencias) en entorno limpio.
+- E2E/tests reales (npm install + jest).
+- PRs en GitHub.
+- M7–M10 completos y PWA full real.
+
+## Instrucción guardada
+Al final de cada bloque, subir cambios a los repos correspondientes (backend/frontend) y avisar.
+EOF

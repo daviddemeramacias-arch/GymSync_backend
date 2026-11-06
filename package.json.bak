@@ -1,0 +1,33 @@
+{
+  "name": "gymsync-monorepo",
+  "version": "1.0.0",
+  "description": "GymSync — Smart Gym Operations & Membership Ecosystem",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "admin-web",
+    "pwa-socio"
+  ],
+  "scripts": {
+    "dev": "docker-compose up -d && npm run dev:backend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:admin": "cd admin-web && npm start",
+    "dev:pwa": "cd pwa-socio && npm start",
+    "build:all": "npm run build:backend && npm run build:admin && npm run build:pwa",
+    "build:backend": "cd backend && npm run build",
+    "build:admin": "cd admin-web && npm run build",
+    "build:pwa": "cd pwa-socio && npm run build",
+    "test": "cd backend && npm test",
+    "lint": "eslint . --ext .ts,.tsx",
+    "db:migrate": "cd backend && npm run migration:run",
+    "db:seed": "cd backend && npm run seed",
+    "db:reset": "cd backend && npm run migration:revert && npm run migration:run && npm run seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
