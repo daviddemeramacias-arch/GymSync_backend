@@ -1,0 +1,70 @@
+### Variables
+@base = http://localhost:3000/api/v1
+@token = {{login.response.body.token}}
+
+### Health
+GET {{base}}/health
+
+### Auth - Login PIN
+POST {{base}}/auth/login-pin
+Content-Type: application/json
+
+{"phone":"+593999999999","pin":"1234"}
+
+### Auth - Perfil
+GET {{base}}/auth/me
+Authorization: Bearer {{token}}
+
+### Members - Crear plan
+POST {{base}}/members/plans
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gym_id":"00000000-0000-0000-0000-000000000001","name":"Mensual","price":45,"duration_days":30}
+
+### Finance - Crear cuenta bancaria
+POST {{base}}/finance/bank-accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gym_id":"00000000-0000-0000-0000-000000000001","bank_name":"Pichincha","account_number":"123456","account_holder":"GymSync"}
+
+### Finance - Crear pago
+POST {{base}}/finance/payments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"user_id":"USER_ID","gym_id":"00000000-0000-0000-0000-000000000001","amount":45,"method":"TRANSFER"}
+
+### Marketplace - Crear producto
+POST {{base}}/marketplace/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gym_id":"00000000-0000-0000-0000-000000000001","name":"Proteina","price":42,"stock":10}
+
+### Routines - Crear rutina
+POST {{base}}/routines
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gym_id":"00000000-0000-0000-0000-000000000001","name":"Pierna"}
+
+### Notifications - Enviar
+POST {{base}}/notifications/send
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gym_id":"00000000-0000-0000-0000-000000000001","channel":"WHATSAPP","type":"CUSTOM","content":"Hola"}
+
+### Metrics - KPIs
+GET {{base}}/metrics/kpis?gym_id=00000000-0000-0000-0000-000000000001
+Authorization: Bearer {{token}}
+
+### Access - Validar token
+POST {{base}}/access/validate
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"gym_id":"00000000-0000-0000-0000-000000000001","method":"QR","code_4digit":"1234"}
+PY
