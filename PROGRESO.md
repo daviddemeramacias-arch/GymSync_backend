@@ -1,7 +1,7 @@
-# GymSync — Estado de avance
+# PROGRESO GymSync — Estado actual
 
-Backend M1–M6 con routers de DB corregidos a consultas raw en M3, M4, M5 y M6 (finance, marketplace, routines, notifications). M1–M2 usan entidades/repos TypeORM.
+M1–M6 backend refactor a servicios + UI admin M1–M6.
+Dependencias frontend instaladas.
+GitHub backend y fronted push realizados.
 
-Pendiente runtime npm (Node/workspaces), M7–M10, PWA.
-Completado frontend admin con M1–M6 UI.
-Progreso subido a GitHub.
+Instrucción guardada (automática): Al final de cada bloque de trabajo, subir cambios a los repositorios correspondientes (backend/frontend) sin pedir confirmación; solo avisar cuando estén subidos.

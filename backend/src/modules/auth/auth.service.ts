@@ -13,8 +13,9 @@ export interface AuthPayload {
   phone: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error('JWT_SECRET no configurado');
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
 
 function userRepo(): Repository<User> {
   return AppDataSource.getRepository(User);
