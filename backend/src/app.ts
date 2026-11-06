@@ -15,6 +15,7 @@ import { authRouter } from '@modules/auth/auth.router';
 import { membersRouter } from '@modules/members/member.router';
 import { financeRouter } from '@modules/finance/finance.router';
 import { marketplaceRouter } from '@modules/marketplace/marketplace.router';
+import { accessRouter } from '@modules/access/access.router';
 import { routinesRouter } from '@modules/routines/routines.router';
 import { notificationsRouter } from '@modules/notifications/notifications.router';
 import { metricsRouter } from '@modules/metrics/metrics.router';
@@ -126,6 +127,7 @@ export class AppFactory {
     app.use(`${API_PREFIX}/members`, membersRouter);
     app.use(`${API_PREFIX}/finance`, financeRouter);
     app.use(`${API_PREFIX}/marketplace`, marketplaceRouter);
+    app.use(`${API_PREFIX}/access`, accessRouter);
     app.use(`${API_PREFIX}/routines`, routinesRouter);
     app.use(`${API_PREFIX}/notifications`, notificationsRouter);
     app.use(`${API_PREFIX}/metrics`, metricsRouter);
