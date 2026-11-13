@@ -11,7 +11,7 @@ function validate(req:any,_res:any,next:any){const e=validationResult(req);if(!e
 router.post('/validate', authGuard, [
   body('gym_id').isString().notEmpty(),
   body('method').isIn(['QR','PIN','BIOMETRIC','MANUAL']),
-], validate, async (req,res,next)=>{
+], validate, async (req:any,res:any,next:any)=>{
   try{
     const { gym_id, method, code_4digit, user_id } = req.body;
     if (code_4digit) {
@@ -33,7 +33,7 @@ router.post('/validate', authGuard, [
   }catch(e){next(e);}
 });
 
-router.get('/aforo', authGuard, async (req:any,res,next)=>{
+router.get('/aforo', authGuard, async (req:any,res:any,next:any)=>{
   try{
     const gym_id=req.query.gym_id||req.user?.gym_id;
     const rows=await AppDataSource.query("SELECT COUNT(*) c FROM access_logs WHERE gym_id=? AND result='GRANTED' AND DATE(created_at)=CURDATE()",[gym_id]);

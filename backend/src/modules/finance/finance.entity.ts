@@ -37,4 +37,3 @@ export class Payment {
   @CreateDateColumn() created_at!: Date;
   @UpdateDateColumn() updated_at!: Date;
 }
-PY

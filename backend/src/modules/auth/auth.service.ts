@@ -13,7 +13,7 @@ export interface AuthPayload {
   phone: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET as string;
 if (!JWT_SECRET) throw new Error('JWT_SECRET no configurado');
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
 
@@ -79,7 +79,7 @@ export async function loginWithPin(phone: string, pin: string): Promise<{ token:
 
 export async function verifyToken(token: string): Promise<AuthPayload> {
   try {
-    return jwt.verify(token, JWT_SECRET) as AuthPayload;
+    return jwt.verify(token, JWT_SECRET) as unknown as AuthPayload;
   } catch {
     throw new AppError('Token inválido o expirado', 401);
   }

@@ -3,6 +3,8 @@ import { body } from 'express-validator';
 import { validationResult } from 'express-validator';
 import { authGuard, requireRoles, AuthRequest } from '../auth/auth.middleware';
 import { AppError } from '@shared/utils/app-error';
+import { AppDataSource } from '@config/database.config';
+import { createPinForUser } from '../auth/auth.service';
 import {
   createPlan, listPlans, updatePlan, assignMembership,
   listMembershipsByUser, freezeMembership,
@@ -75,7 +77,7 @@ router.post('/users', authGuard, requireRoles(1,2), [
   body('first_name').isString().notEmpty(),
   body('last_name').isString().notEmpty(),
   body('phone').isString().notEmpty(),
-], validate, async (req, res, next) => {
+], validate, async (req: any, res: any, next: any) => {
   try {
     const r = AppDataSource.getRepository('roles') as any;
     const role = await r.findOneBy({ name: 'MEMBER' });

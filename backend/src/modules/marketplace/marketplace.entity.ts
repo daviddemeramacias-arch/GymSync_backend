@@ -29,4 +29,3 @@ export class AccessToken {
   @Column({ type:'timestamp' }) expires_at!: Date;
   @CreateDateColumn() created_at!: Date;
 }
-PY

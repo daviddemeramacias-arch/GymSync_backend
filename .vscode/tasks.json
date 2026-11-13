@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1 · DB: levantar MySQL y Redis",
+      "type": "shell",
+      "command": "docker compose up -d",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "2 · Backend: instalar dependencias",
+      "type": "shell",
+      "command": "npm install",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "problemMatcher": []
+    },
+    {
+      "label": "3 · Backend: migraciones",
+      "type": "shell",
+      "command": "npm run migration:run",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "problemMatcher": []
+    },
+    {
+      "label": "4 · Backend: seed",
+      "type": "shell",
+      "command": "npm run seed",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: preparar (instalar + migrar + seed)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "2 · Backend: instalar dependencias",
+        "3 · Backend: migraciones",
+        "4 · Backend: seed"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Admin: ng serve",
+      "type": "shell",
+      "command": "npx ng serve --port 4200",
+      "options": { "cwd": "${workspaceFolder}/admin-web" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "PWA: servir",
+      "type": "shell",
+      "command": "python -m http.server 4201 --bind 127.0.0.1",
+      "options": { "cwd": "${workspaceFolder}/pwa-socio" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "TODO: iniciar (backend + admin + PWA)",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "Backend: dev",
+        "Admin: ng serve",
+        "PWA: servir"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
