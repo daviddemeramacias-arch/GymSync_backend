@@ -17,22 +17,22 @@ export class User {
   @Column({ type: 'int', unsigned: true })
   role_id!: number;
 
-  @Column({ length: 80 })
+  @Column({ type: 'varchar',  length: 80 })
   first_name!: string;
 
-  @Column({ length: 80 })
+  @Column({ type: 'varchar',  length: 80 })
   last_name!: string;
 
-  @Column({ length: 20 })
+  @Column({ type: 'varchar',  length: 20 })
   phone!: string;
 
   @Column({ default: false })
   phone_verified!: boolean;
 
-  @Column({ length: 150, nullable: true })
+  @Column({ type: 'varchar',  length: 150, nullable: true })
   email!: string | null;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar',  length: 255, nullable: true })
   pin_hash!: string | null;
 
   @Column({ default: true })

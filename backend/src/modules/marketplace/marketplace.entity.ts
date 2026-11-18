@@ -4,13 +4,13 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 export class Product {
   @PrimaryGeneratedColumn('uuid') id!: string;
   @Column({ type:'char',length:36 }) gym_id!: string;
-  @Column({ length:150 }) name!: string;
+  @Column({ type: 'varchar',  length:150 }) name!: string;
   @Column({ type:'text', nullable:true }) description!: string | null;
   @Column({ type:'enum', enum:['SUPPLEMENT','CLOTHING','ACCESSORY','OTHER'], default:'SUPPLEMENT' }) category!: string;
   @Column({ type:'decimal',precision:8,scale:2 }) price!: number;
   @Column({ type:'int', unsigned:true, default:0 }) stock!: number;
   @Column({ type:'int', unsigned:true, default:5 }) min_stock!: number;
-  @Column({ length:500, nullable:true }) image_url!: string | null;
+  @Column({ type: 'varchar',  length:500, nullable:true }) image_url!: string | null;
   @Column({ default:true }) is_active!: boolean;
   @CreateDateColumn() created_at!: Date;
   @UpdateDateColumn() updated_at!: Date;

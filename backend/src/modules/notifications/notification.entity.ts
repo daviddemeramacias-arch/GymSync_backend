@@ -10,6 +10,6 @@ export class NotificationLog {
   @Column({ type:'text', nullable:true }) content!: string | null;
   @Column({ type:'enum', enum:['SENT','FAILED','PENDING'], default:'PENDING' }) status!: string;
   @Column({ type:'timestamp', nullable:true }) sent_at!: Date | null;
-  @Column({ length:500, nullable:true }) error_msg!: string | null;
+  @Column({ type: 'varchar',  length:500, nullable:true }) error_msg!: string | null;
   @CreateDateColumn() created_at!: Date;
 }

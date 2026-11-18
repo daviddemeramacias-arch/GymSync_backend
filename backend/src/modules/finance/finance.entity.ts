@@ -4,12 +4,12 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 export class BankAccount {
   @PrimaryGeneratedColumn('uuid') id!: string;
   @Column({ type:'char',length:36 }) gym_id!: string;
-  @Column({ length:100 }) bank_name!: string;
+  @Column({ type: 'varchar',  length:100 }) bank_name!: string;
   @Column({ type:'enum', enum:['SAVINGS','CHECKING'], default:'SAVINGS' }) account_type!: string;
-  @Column({ length:30 }) account_number!: string;
-  @Column({ length:150 }) account_holder!: string;
-  @Column({ length:20, nullable:true }) id_number!: string | null;
-  @Column({ length:500, nullable:true }) qr_image_url!: string | null;
+  @Column({ type: 'varchar',  length:30 }) account_number!: string;
+  @Column({ type: 'varchar',  length:150 }) account_holder!: string;
+  @Column({ type: 'varchar',  length:20, nullable:true }) id_number!: string | null;
+  @Column({ type: 'varchar',  length:500, nullable:true }) qr_image_url!: string | null;
   @Column({ default:true }) is_active!: boolean;
   @CreateDateColumn() created_at!: Date;
 }
@@ -25,9 +25,9 @@ export class Payment {
   @Column({ type:'char',length:3,default:'USD' }) currency!: string;
   @Column({ type:'enum', enum:['CASH','TRANSFER','CARD'], default:'TRANSFER' }) method!: string;
   @Column({ type:'enum', enum:['PENDING','IN_REVIEW','APPROVED','REJECTED'], default:'PENDING' }) status!: string;
-  @Column({ length:500, nullable:true }) receipt_url!: string | null;
+  @Column({ type: 'varchar',  length:500, nullable:true }) receipt_url!: string | null;
   @Column({ type:'json', nullable:true }) ocr_data!: any;
-  @Column({ length:100, nullable:true }) bank_reference!: string | null;
+  @Column({ type: 'varchar',  length:100, nullable:true }) bank_reference!: string | null;
   @Column({ type:'char',length:36, nullable:true }) bank_account_id!: string | null;
   @Column({ type:'char',length:36, nullable:true }) approved_by!: string | null;
   @Column({ type:'timestamp', nullable:true }) approved_at!: Date | null;
