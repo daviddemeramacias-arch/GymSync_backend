@@ -2,75 +2,73 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "1 · DB: levantar MySQL y Redis",
+      "label": "GymSync: verificar MySQL y Docker",
       "type": "shell",
-      "command": "docker compose up -d",
+      "command": "powershell -NoProfile -Command \"Get-Service MySQL,com.docker.service | Select-Object Name,Status,StartType\"",
       "options": { "cwd": "${workspaceFolder}" },
       "problemMatcher": []
     },
     {
-      "label": "2 · Backend: instalar dependencias",
-      "type": "shell",
-      "command": "npm install",
-      "options": { "cwd": "${workspaceFolder}/backend" },
-      "problemMatcher": []
-    },
-    {
-      "label": "3 · Backend: migraciones",
-      "type": "shell",
-      "command": "npm run migration:run",
-      "options": { "cwd": "${workspaceFolder}/backend" },
-      "problemMatcher": []
-    },
-    {
-      "label": "4 · Backend: seed",
+      "label": "GymSync: seed (usuarios demo)",
       "type": "shell",
       "command": "npm run seed",
-      "options": { "cwd": "${workspaceFolder}/backend" },
+      "options": {
+        "cwd": "${workspaceFolder}/backend",
+        "env": { "PATH": "C:\\Users\\Deivis_Pc\\AppData\\Local\\node20;${env:PATH}" }
+      },
       "problemMatcher": []
     },
     {
-      "label": "Backend: preparar (instalar + migrar + seed)",
-      "dependsOrder": "sequence",
-      "dependsOn": [
-        "2 · Backend: instalar dependencias",
-        "3 · Backend: migraciones",
-        "4 · Backend: seed"
-      ],
-      "problemMatcher": []
-    },
-    {
-      "label": "Backend: dev",
+      "label": "GymSync: backend (build + start)",
       "type": "shell",
-      "command": "npm run dev",
-      "options": { "cwd": "${workspaceFolder}/backend" },
+      "command": "npm run build; npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/backend",
+        "env": { "PATH": "C:\\Users\\Deivis_Pc\\AppData\\Local\\node20;${env:PATH}" }
+      },
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "Admin: ng serve",
+      "label": "GymSync: admin Angular :4200",
       "type": "shell",
-      "command": "npx ng serve --port 4200",
+      "command": "npm start",
       "options": { "cwd": "${workspaceFolder}/admin-web" },
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "PWA: servir",
+      "label": "GymSync: preview :5173",
       "type": "shell",
-      "command": "python -m http.server 4201 --bind 127.0.0.1",
+      "command": "python -m http.server 5173",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "GymSync: PWA socio :4201",
+      "type": "shell",
+      "command": "python -m http.server 4201",
       "options": { "cwd": "${workspaceFolder}/pwa-socio" },
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "TODO: iniciar (backend + admin + PWA)",
+      "label": "GymSync: INICIAR TODO",
       "dependsOrder": "parallel",
       "dependsOn": [
-        "Backend: dev",
-        "Admin: ng serve",
-        "PWA: servir"
+        "GymSync: backend (build + start)",
+        "GymSync: admin Angular :4200",
+        "GymSync: preview :5173",
+        "GymSync: PWA socio :4201"
       ],
+      "problemMatcher": []
+    },
+    {
+      "label": "GymSync: detener servidores 3000/4200/4201/5173",
+      "type": "shell",
+      "command": "powershell -NoProfile -Command \"Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in 3000,4200,4201,5173 } | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }\"",
+      "options": { "cwd": "${workspaceFolder}" },
       "problemMatcher": []
     }
   ]
