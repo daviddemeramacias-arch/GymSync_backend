@@ -54,14 +54,18 @@
       "problemMatcher": []
     },
     {
-      "label": "GymSync: INICIAR TODO",
-      "dependsOrder": "parallel",
-      "dependsOn": [
-        "GymSync: backend (build + start)",
-        "GymSync: admin Angular :4200",
-        "GymSync: preview :5173",
-        "GymSync: PWA socio :4201"
-      ],
+      "label": "GymSync: AUTO-START al abrir carpeta",
+      "type": "shell",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\scripts\\start-all.ps1\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "runOptions": { "runOn": "folderOpen" },
+      "problemMatcher": []
+    },
+    {
+      "label": "GymSync: INICIAR TODO (script)",
+      "type": "shell",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}\\scripts\\start-all.ps1\"",
+      "options": { "cwd": "${workspaceFolder}" },
       "problemMatcher": []
     },
     {
