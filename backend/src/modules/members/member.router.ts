@@ -19,6 +19,67 @@ function validate(req: any, _res: any, next: any) {
   next();
 }
 
+/** Reserva el siguiente Gym ID de forma atómica: 002, 003, 004... */
+async function allocateNextGymId(): Promise<string> {
+  await AppDataSource.query('START TRANSACTION');
+  try {
+    const rows: any[] = await AppDataSource.query(
+      "SELECT next_value FROM gym_sequences WHERE name='GYM_ID' FOR UPDATE"
+    );
+    const value = Number(rows[0]?.next_value || 1);
+    await AppDataSource.query(
+      "UPDATE gym_sequences SET next_value=? WHERE name='GYM_ID'", [value + 1]
+    );
+    await AppDataSource.query('COMMIT');
+    return String(value).padStart(3, '0');
+  } catch (e) {
+    await AppDataSource.query('ROLLBACK');
+    throw e;
+  }
+}
+
+/** Crea el gimnasio si no existe para que la FK de users no falle. */
+async function ensureGym(id: string): Promise<void> {
+  const rows: any[] = await AppDataSource.query('SELECT id FROM gyms WHERE id=?', [id]);
+  if (rows.length) return;
+  await AppDataSource.query(
+    'INSERT INTO gyms (id, name, slug, country) VALUES (?,?,?,?)',
+    [id, `GymSync ${id}`, `gymsync-${id}`, 'EC']
+  );
+  // Si escriben un ID alto a mano (por ejemplo 009), la secuencia salta a 010.
+  const n = parseInt(id, 10);
+  if (!isNaN(n)) {
+    await AppDataSource.query(
+      "UPDATE gym_sequences SET next_value=GREATEST(next_value, ?) WHERE name='GYM_ID'",
+      [n + 1]
+    );
+  }
+}
+
+// Gym IDs: siguiente sugerido y lista de gimnasios disponibles
+router.get('/gyms/next-id', authGuard, async (_req, res, next) => {
+  try {
+    const rows: any[] = await AppDataSource.query(
+      "SELECT next_value FROM gym_sequences WHERE name='GYM_ID'"
+    );
+    const next_id = String(rows[0]?.next_value || 1).padStart(3, '0');
+    res.json({ status: 'success', next_id });
+  } catch (e) { next(e); }
+});
+
+router.get('/gyms', authGuard, requireRoles(1, 2), async (_req, res, next) => {
+  try {
+    const gyms = await AppDataSource.query(
+      'SELECT id, name FROM gyms ORDER BY CAST(id AS UNSIGNED), id'
+    );
+    const seq: any[] = await AppDataSource.query(
+      "SELECT next_value FROM gym_sequences WHERE name='GYM_ID'"
+    );
+    const next_id = String(seq[0]?.next_value || 1).padStart(3, '0');
+    res.json({ status: 'success', gyms, next_id });
+  } catch (e) { next(e); }
+});
+
 // Plans
 router.post('/plans', authGuard, requireRoles(1, 2), [
   body('gym_id').isString().notEmpty(),
@@ -33,8 +94,10 @@ router.post('/plans', authGuard, requireRoles(1, 2), [
 
 router.get('/plans', authGuard, async (req: any, res, next) => {
   try {
-    const gym_id = req.query.gym_id || req.user?.gym_id;
-    const plans = await listPlans(gym_id);
+    const gym_id = req.query.gym_id ? normalizeGymId(req.query.gym_id) : null;
+    const plans = gym_id
+      ? await listPlans(gym_id)
+      : await AppDataSource.query('SELECT * FROM plans ORDER BY name');
     res.json({ status: 'success', plans });
   } catch (e) { next(e); }
 });
@@ -74,7 +137,7 @@ router.patch('/memberships/:id/freeze', authGuard, requireRoles(1, 2), async (re
 
 // Create socio + PIN
 router.post('/users', authGuard, requireRoles(1,2), [
-  body('gym_id').isString().notEmpty(),
+  body('gym_id').optional().isString(),
   body('first_name').isString().notEmpty(),
   body('last_name').isString().notEmpty(),
   body('phone').isString().notEmpty(),
@@ -86,10 +149,16 @@ router.post('/users', authGuard, requireRoles(1,2), [
     );
     const role = roles[0];
     if (!role) throw new AppError('Rol MEMBER no encontrado', 500);
+
+    // Si no escriben Gym ID se reserva el siguiente de la secuencia.
+    const requested = typeof req.body.gym_id === 'string' ? req.body.gym_id.trim() : '';
+    const gymId = requested ? normalizeGymId(requested) : await allocateNextGymId();
+    await ensureGym(gymId);
+
     const ur = AppDataSource.getRepository('users') as any;
     const u = ur.create({
       ...req.body,
-      gym_id: normalizeGymId(req.body.gym_id),
+      gym_id: gymId,
       role_id: role.id,
       status: 'ACTIVE',
       pin_temp: true,
@@ -103,7 +172,8 @@ router.post('/users', authGuard, requireRoles(1,2), [
 // Listado de socios con su plan, PIN (mascarado) y gimnasio
 router.get('/socios', authGuard, requireRoles(1, 2), async (req: any, res: any, next: any) => {
   try {
-    const gymId = normalizeGymId(req.query.gym_id || req.user?.gym_id);
+    // Sin filtro se listan todos los gimnasios (admin multi-sede).
+    const gymId = req.query.gym_id ? normalizeGymId(req.query.gym_id) : null;
     const socios = await AppDataSource.query(
       `SELECT u.id, u.first_name, u.last_name, u.phone, u.email, u.gym_id,
               u.status, u.pin_temp,
@@ -115,9 +185,9 @@ router.get('/socios', authGuard, requireRoles(1, 2), async (req: any, res: any, 
        LEFT JOIN memberships m ON m.user_id = u.id AND m.status = 'ACTIVE'
        LEFT JOIN plans p ON p.id = m.plan_id
        WHERE u.role_id = (SELECT id FROM roles WHERE name='MEMBER' LIMIT 1)
-         AND u.gym_id = ?
+         AND (? IS NULL OR u.gym_id = ?)
        ORDER BY u.created_at DESC`,
-      [gymId]
+      [gymId, gymId]
     );
     res.json({ status: 'success', socios });
   } catch (e) { next(e); }
@@ -136,9 +206,9 @@ router.patch('/users/:id', authGuard, requireRoles(1, 2), [
       if (req.body[key] !== undefined) { fields.push(`${key}=?`); values.push(req.body[key]); }
     }
     if (!fields.length) throw new AppError('Sin cambios para actualizar', 400);
-    values.push(req.params.id, normalizeGymId(req.user?.gym_id));
+    values.push(req.params.id);
     await AppDataSource.query(
-      `UPDATE users SET ${fields.join(', ')} WHERE id=? AND gym_id=?`, values
+      `UPDATE users SET ${fields.join(', ')} WHERE id=?`, values
     );
     const rows = await AppDataSource.query(
       'SELECT id, first_name, last_name, phone, email, gym_id, status FROM users WHERE id=?',
@@ -151,10 +221,9 @@ router.patch('/users/:id', authGuard, requireRoles(1, 2), [
 // Dar de baja (baja lógica: no se borra el historial)
 router.patch('/users/:id/deactivate', authGuard, requireRoles(1, 2), async (req: any, res: any, next: any) => {
   try {
-    const gymId = normalizeGymId(req.user?.gym_id);
     await AppDataSource.query(
-      "UPDATE users SET status='INACTIVE' WHERE id=? AND gym_id=?",
-      [req.params.id, gymId]
+      "UPDATE users SET status='INACTIVE' WHERE id=?",
+      [req.params.id]
     );
     await AppDataSource.query(
       "UPDATE memberships SET status='CANCELLED' WHERE user_id=? AND status='ACTIVE'",

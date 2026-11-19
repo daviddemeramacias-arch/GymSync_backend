@@ -27,17 +27,17 @@ export async function createOrder(gym_id:string,user_id:string,product_id:string
   return { product_id, product_name: prod.name, quantity, unit_price: prod.price, total, token };
 }
 
-export async function listOrders(gym_id: string) {
+export async function listOrders(gym_id: string | null) {
   return AppDataSource.query(
     `SELECT o.id, o.gym_id, o.user_id, o.product_name, o.quantity, o.unit_price,
             o.total, o.pickup_token, o.status, o.created_at,
             u.first_name, u.last_name, u.phone
      FROM orders o
      LEFT JOIN users u ON u.id = o.user_id
-     WHERE o.gym_id = ?
+     WHERE (? IS NULL OR o.gym_id = ?)
      ORDER BY o.created_at DESC
      LIMIT 200`,
-    [gym_id]
+    [gym_id, gym_id]
   );
 }
 

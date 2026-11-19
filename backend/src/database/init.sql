@@ -243,6 +243,14 @@ CREATE TABLE IF NOT EXISTS orders (
   INDEX idx_orders_gym (gym_id, created_at)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS gym_sequences (
+  name VARCHAR(30) NOT NULL PRIMARY KEY,
+  next_value INT UNSIGNED NOT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+INSERT IGNORE INTO gym_sequences (name, next_value) VALUES ('GYM_ID', 2);
+
 INSERT IGNORE INTO roles (name, description) VALUES
   ('OWNER', 'Dueno del gimnasio - acceso total'),
   ('ADMIN', 'Administrador - gestion operativa'),
