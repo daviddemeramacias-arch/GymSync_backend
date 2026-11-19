@@ -100,5 +100,85 @@ router.post('/users', authGuard, requireRoles(1,2), [
   } catch (e) { next(e); }
 });
 
+// Listado de socios con su plan, PIN (mascarado) y gimnasio
+router.get('/socios', authGuard, requireRoles(1, 2), async (req: any, res: any, next: any) => {
+  try {
+    const gymId = normalizeGymId(req.query.gym_id || req.user?.gym_id);
+    const socios = await AppDataSource.query(
+      `SELECT u.id, u.first_name, u.last_name, u.phone, u.email, u.gym_id,
+              u.status, u.pin_temp,
+              CASE WHEN u.pin_hash IS NOT NULL THEN 1 ELSE 0 END AS has_pin,
+              m.id AS membership_id, m.status AS membership_status,
+              m.start_date, m.end_date,
+              p.id AS plan_id, p.name AS plan_name, p.price AS plan_price
+       FROM users u
+       LEFT JOIN memberships m ON m.user_id = u.id AND m.status = 'ACTIVE'
+       LEFT JOIN plans p ON p.id = m.plan_id
+       WHERE u.role_id = (SELECT id FROM roles WHERE name='MEMBER' LIMIT 1)
+         AND u.gym_id = ?
+       ORDER BY u.created_at DESC`,
+      [gymId]
+    );
+    res.json({ status: 'success', socios });
+  } catch (e) { next(e); }
+});
+
+// Editar datos del socio
+router.patch('/users/:id', authGuard, requireRoles(1, 2), [
+  body('first_name').optional().isString().notEmpty(),
+  body('last_name').optional().isString().notEmpty(),
+  body('phone').optional().isString().notEmpty(),
+], validate, async (req: any, res: any, next: any) => {
+  try {
+    const fields: string[] = [];
+    const values: any[] = [];
+    for (const key of ['first_name', 'last_name', 'phone', 'email', 'status']) {
+      if (req.body[key] !== undefined) { fields.push(`${key}=?`); values.push(req.body[key]); }
+    }
+    if (!fields.length) throw new AppError('Sin cambios para actualizar', 400);
+    values.push(req.params.id, normalizeGymId(req.user?.gym_id));
+    await AppDataSource.query(
+      `UPDATE users SET ${fields.join(', ')} WHERE id=? AND gym_id=?`, values
+    );
+    const rows = await AppDataSource.query(
+      'SELECT id, first_name, last_name, phone, email, gym_id, status FROM users WHERE id=?',
+      [req.params.id]
+    );
+    res.json({ status: 'success', user: rows[0] });
+  } catch (e) { next(e); }
+});
+
+// Dar de baja (baja lógica: no se borra el historial)
+router.patch('/users/:id/deactivate', authGuard, requireRoles(1, 2), async (req: any, res: any, next: any) => {
+  try {
+    const gymId = normalizeGymId(req.user?.gym_id);
+    await AppDataSource.query(
+      "UPDATE users SET status='INACTIVE' WHERE id=? AND gym_id=?",
+      [req.params.id, gymId]
+    );
+    await AppDataSource.query(
+      "UPDATE memberships SET status='CANCELLED' WHERE user_id=? AND status='ACTIVE'",
+      [req.params.id]
+    );
+    res.json({ status: 'success', message: 'Socio dado de baja' });
+  } catch (e) { next(e); }
+});
+
+// Cambiar el plan de una membresía activa
+router.patch('/memberships/:id/plan', authGuard, requireRoles(1, 2), [
+  body('plan_id').isString().notEmpty(),
+], validate, async (req: any, res: any, next: any) => {
+  try {
+    const plans = await AppDataSource.query('SELECT duration_days FROM plans WHERE id=?', [req.body.plan_id]);
+    if (!plans.length) throw new AppError('Plan no encontrado', 404);
+    await AppDataSource.query(
+      `UPDATE memberships SET plan_id=?, end_date=DATE_ADD(CURDATE(), INTERVAL ? DAY), status='ACTIVE' WHERE id=?`,
+      [req.body.plan_id, plans[0].duration_days, req.params.id]
+    );
+    const rows = await AppDataSource.query('SELECT * FROM memberships WHERE id=?', [req.params.id]);
+    res.json({ status: 'success', membership: rows[0] });
+  } catch (e) { next(e); }
+});
+
 export { router as membersRouter };
 export default router;

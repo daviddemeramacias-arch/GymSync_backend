@@ -225,6 +225,24 @@ CREATE TABLE IF NOT EXISTS workout_logs (
   FOREIGN KEY (gym_id) REFERENCES gyms(id) ON DELETE CASCADE,
   INDEX idx_logs_user (user_id, created_at)
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS orders (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  gym_id CHAR(36) NOT NULL,
+  user_id CHAR(36) NOT NULL,
+  product_id CHAR(36) NOT NULL,
+  product_name VARCHAR(150) NOT NULL,
+  quantity INT UNSIGNED NOT NULL DEFAULT 1,
+  unit_price DECIMAL(8,2) NOT NULL,
+  total DECIMAL(8,2) NOT NULL,
+  pickup_token CHAR(4) NOT NULL,
+  status ENUM('PENDING','DELIVERED','CANCELLED') NOT NULL DEFAULT 'PENDING',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (gym_id) REFERENCES gyms(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
+  INDEX idx_orders_gym (gym_id, created_at)
+) ENGINE=InnoDB;
+
 INSERT IGNORE INTO roles (name, description) VALUES
   ('OWNER', 'Dueno del gimnasio - acceso total'),
   ('ADMIN', 'Administrador - gestion operativa'),

@@ -10,5 +10,7 @@ router.post('/products', authGuard, requireRoles(1,2), [body('gym_id').isString(
 router.get('/products', authGuard, async (req:any,res:any,next:any)=>{try{res.json({status:'success',products:await S.listProducts(req.query.gym_id||req.user?.gym_id)});}catch(e){next(e);}});
 router.patch('/products/:id', authGuard, requireRoles(1,2), async (req:any,res:any,next:any)=>{try{res.json({status:'success',product:await S.updateProduct(req.params.id,req.body)});}catch(e){next(e);}});
 router.post('/orders', authGuard, [body('gym_id').isString().notEmpty(), body('user_id').isString().notEmpty(), body('product_id').isString().notEmpty()], validate, async (req:any,res:any,next:any)=>{try{const {gym_id,user_id,product_id,quantity=1}=req.body; res.status(201).json({status:'success',order:await S.createOrder(gym_id,user_id,product_id,quantity)});}catch(e){next(e);}});
+router.get('/orders', authGuard, async (req:any,res:any,next:any)=>{try{res.json({status:'success',orders:await S.listOrders(req.query.gym_id||req.user?.gym_id)});}catch(e){next(e);}});
+router.patch('/orders/:id/status', authGuard, requireRoles(1,2), async (req:any,res:any,next:any)=>{try{res.json({status:'success',order:await S.updateOrderStatus(req.params.id,req.body.status)});}catch(e){next(e);}});
 export {router as marketplaceRouter};
 export default router;
