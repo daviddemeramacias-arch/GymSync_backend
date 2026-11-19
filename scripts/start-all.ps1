@@ -18,6 +18,13 @@ try {
 
 # Backend :3000
 if (-not (Test-Port 3000)) {
+  # Eliminar procesos backend colgados (vivos pero sin escuchar) para evitar acumulación
+  Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -match 'dist/main\.js' } |
+    ForEach-Object {
+      Log "Backend colgado PID $($_.ProcessId) eliminado"
+      Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+    }
   $dir = Join-Path $root 'backend'
   $p = Start-Process -FilePath 'C:\Users\Deivis_Pc\AppData\Local\node20\node.exe' `
     -ArgumentList '-r', './path-setup.js', '-r', 'tsconfig-paths/register', 'dist/main.js' `

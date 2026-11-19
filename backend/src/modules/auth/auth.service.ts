@@ -41,9 +41,20 @@ export async function createPinForUser(userId: string): Promise<{ pin: string; u
   return { pin, user };
 }
 
+/** Acepta teléfonos en formato internacional (+593...) o local (09...). */
+export function normalizePhone(phone: string): string {
+  let p = (phone || '').trim().replace(/[\s\-()]/g, '');
+  if (p.startsWith('+593')) p = '0' + p.slice(4);
+  else if (p.startsWith('593')) p = '0' + p.slice(3);
+  return p;
+}
+
 export async function loginWithPin(phone: string, pin: string): Promise<{ token: string; user: User }> {
   const repo = userRepo();
-  const user = await repo.findOne({ where: { phone } });
+  const normalized = normalizePhone(phone);
+  const user = await repo.findOne({
+    where: normalized === phone ? { phone } : [{ phone }, { phone: normalized }],
+  });
   if (!user || !user.pin_hash) throw new AppError('Credenciales inválidas', 401);
 
   if (user.locked_until && new Date() < user.locked_until) {
