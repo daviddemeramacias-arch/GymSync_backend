@@ -4,6 +4,7 @@ import { validationResult } from 'express-validator';
 import { authGuard, requireRoles, AuthRequest } from '../auth/auth.middleware';
 import { AppError } from '@shared/utils/app-error';
 import { AppDataSource } from '@config/database.config';
+import { normalizeGymId } from '@shared/utils/gym';
 import { createPinForUser } from '../auth/auth.service';
 import {
   createPlan, listPlans, updatePlan, assignMembership,
@@ -25,7 +26,7 @@ router.post('/plans', authGuard, requireRoles(1, 2), [
   body('price').isNumeric(),
 ], validate, async (req: any, res: any, next: any) => {
   try {
-    const plan = await createPlan(req.body);
+    const plan = await createPlan({ ...req.body, gym_id: normalizeGymId(req.body.gym_id) });
     res.status(201).json({ status: 'success', plan });
   } catch (e) { next(e); }
 });
@@ -52,7 +53,7 @@ router.post('/memberships', authGuard, requireRoles(1, 2), [
   body('gym_id').isString().notEmpty(),
 ], validate, async (req: any, res: any, next: any) => {
   try {
-    const m = await assignMembership(req.body);
+    const m = await assignMembership({ ...req.body, gym_id: normalizeGymId(req.body.gym_id) });
     res.status(201).json({ status: 'success', membership: m });
   } catch (e) { next(e); }
 });
@@ -79,11 +80,20 @@ router.post('/users', authGuard, requireRoles(1,2), [
   body('phone').isString().notEmpty(),
 ], validate, async (req: any, res: any, next: any) => {
   try {
-    const r = AppDataSource.getRepository('roles') as any;
-    const role = await r.findOneBy({ name: 'MEMBER' });
+    // 'roles' no es una entidad de TypeORM: se consulta con SQL directo.
+    const roles: any[] = await AppDataSource.query(
+      "SELECT id FROM roles WHERE name = 'MEMBER' LIMIT 1"
+    );
+    const role = roles[0];
     if (!role) throw new AppError('Rol MEMBER no encontrado', 500);
     const ur = AppDataSource.getRepository('users') as any;
-    const u = ur.create({ ...req.body, role_id: role.id, status: 'ACTIVE', pin_temp: true });
+    const u = ur.create({
+      ...req.body,
+      gym_id: normalizeGymId(req.body.gym_id),
+      role_id: role.id,
+      status: 'ACTIVE',
+      pin_temp: true,
+    });
     await ur.save(u);
     const { pin } = await createPinForUser(u.id);
     res.status(201).json({ status: 'success', user: u, pin });

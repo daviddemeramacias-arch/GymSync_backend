@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '@shared/utils/app-error';
 import { verifyToken, AuthPayload } from './auth.service';
+import { normalizeGymId } from '@shared/utils/gym';
 
 export interface AuthRequest extends Request {
   user?: AuthPayload;
@@ -12,6 +13,8 @@ export async function authGuard(req: AuthRequest, _res: Response, next: NextFunc
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     if (!token) throw new AppError('Token no proporcionado', 401);
     req.user = await verifyToken(token);
+    // Tokens emitidos antes del cambio siguen trayendo el UUID viejo.
+    req.user.gym_id = normalizeGymId(req.user.gym_id);
     next();
   } catch (e) {
     next(e);

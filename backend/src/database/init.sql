@@ -232,6 +232,6 @@ INSERT IGNORE INTO roles (name, description) VALUES
   ('MEMBER', 'Socio - acceso a portal PWA');
 
 INSERT IGNORE INTO gyms (id, name, slug, phone, address, city, country) VALUES
-  ('00000000-0000-0000-0000-000000000001', 'GymSync Demo', 'gymsync-demo', '+593999999999', 'Av. Principal 123', 'Calceta', 'EC');
+  ('001', 'GymSync Demo', 'gymsync-demo', '+593999999999', 'Av. Principal 123', 'Calceta', 'EC');
 
 SELECT 'GymSync DB inicializada correctamente' AS resultado;
